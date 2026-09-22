@@ -25,8 +25,10 @@ void Platform::Setup() {
     // Output availability will depend on the communication method
     // and the connection being active.
 
+#ifdef CTI_MINIMAL_STARTUP
+    gPlatform.IO.Print("CTI ready\n");
+#else
     const char* engine = CTI_STR(CTI_ENGINE);
-
     gPlatform.IO.Print(" == Initializing Firmware ==\n");
     gPlatform.IO.Printf("Vendor: %s\n", gPlatform.Info.Vendor());
     gPlatform.IO.Printf("Model: %s\n", gPlatform.Info.Model());
@@ -37,10 +39,13 @@ void Platform::Setup() {
 
     gPlatform.IO.Print(" == Initializing Platform ==\n");
     gPlatform.IO.Flush();
+#endif
     gPlatform.Init();
 
+#ifndef CTI_MINIMAL_STARTUP
     gPlatform.IO.Print("OK\n");
     gPlatform.IO.Flush();
+#endif
 
     //Default status LED to active communications
     gPlatform.IO.SetStatusSource(Comms);

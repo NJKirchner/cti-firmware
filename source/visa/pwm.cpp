@@ -5,6 +5,20 @@ namespace Visa {
 
     using namespace SCPI;
 
+    void printReal(float value) {
+        bool negative = value < 0.0f;
+        if (negative) {
+            value = -value;
+        }
+        uint32_t whole = static_cast<uint32_t>(value);
+        uint16_t fraction = static_cast<uint16_t>((value - whole) * 1000.0f + 0.5f);
+        if (fraction == 1000) {
+            ++whole;
+            fraction = 0;
+        }
+        gPlatform.IO.Printf("%s%lu.%03u\n", negative ? "-" : "", whole, fraction);
+    }
+
     CommandResult pwm_init(ScpiParser* scpi) {
         ChanIndex gpio = scpi->nodeNum(0);
 
@@ -103,7 +117,7 @@ namespace Visa {
 
         float duty = gPlatform.IO.PWM.GetDuty(gpio);
 
-        gPlatform.IO.Printf("%f\n", duty);
+        printReal(duty);
 
         return QueryResult::Success;
     }
@@ -126,7 +140,7 @@ namespace Visa {
 
         float freq = gPlatform.IO.PWM.GetFreq(gpio);
 
-        gPlatform.IO.Printf("%f\n", freq);
+        printReal(freq);
 
         return QueryResult::Success;
     }
