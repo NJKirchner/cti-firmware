@@ -21,7 +21,7 @@ spi_inst_t* spis[spiCount] = { spi0, spi1 };
 
 gpio_function_t uartPinFunction(uint8_t uart, int8_t pin) {
     static const int8_t uart0AuxPins[] = { 2, 3, 14, 15, 18, 19 };
-    static const int8_t uart1AuxPins[] = { 6, 7, 10, 11, 22 };
+    static const int8_t uart1AuxPins[] = { 6, 7, 10, 11, 22, 26, 27 };
     const int8_t* pins = uart == 0 ? uart0AuxPins : uart1AuxPins;
     size_t pinCount = uart == 0
         ? sizeof(uart0AuxPins) / sizeof(uart0AuxPins[0])
