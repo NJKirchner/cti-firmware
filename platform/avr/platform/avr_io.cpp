@@ -108,8 +108,14 @@ void CTI::PlatformDigital::GetPull(ChanIndex channel, PullDirection* direction) 
     *direction = input && ((*registers.output & registers.mask) != 0) ? Up : None;
 }
 
-CTI::LVBlock availableAnalogInputs = {10, {
-    0x00, 0x00, 0x00, 0x06, 0, 1, 2, 3, 4, 5
+CTI::LVBlock availableAnalogInputs = {16, {
+    0x00, 0x00, 0x00, 0x06,
+    0, 14,
+    1, 15,
+    2, 16,
+    3, 17,
+    4, 18,
+    5, 19
 }};
 
 CTI::LVBlock* CTI::PlatformAnalog::Available() {

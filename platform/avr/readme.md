@@ -58,7 +58,7 @@ automatically.
 Digital availability accepts either the SCPI short form `DIG:AVAIL?` or full
 form `DIGital:AVAILable?`. The response is an IEEE-style arbitrary block, not a
 text line: `#222`, followed by 22 binary bytes
-`00 00 00 12 02 03 ... 13`, followed by CRLF. The first four binary bytes
+`00 00 00 12 02 03 ... 13`, followed by LF. The first four binary bytes
 encode an 18-element list, and the remaining bytes are Arduino pins D2-D19.
 
 ## Supported interfaces
@@ -88,6 +88,15 @@ PWM resources follow the ATmega328P hardware:
 I2C and SPI transactions are blocking. Their SCPI binary payloads are limited
 to 16 bytes by the Uno memory profile. D13 is shared by the status LED and SPI
 SCK, so the LED follows clock activity while SPI owns the pin.
+
+`ANAlog:AVAILable?` returns `#216`, followed by the 16-byte payload
+`00 00 00 06 00 0E 01 0F 02 10 03 11 04 12 05 13`, followed by LF. This
+matches the Pico schema: a big-endian U32 channel count and one
+`(ADC channel, GPIO pin)` byte pair per channel.
+
+AVR serial output does not translate LF bytes to CRLF. This matches Pico and is
+required for binary blocks: a payload byte `0A` must remain one byte and cannot
+be expanded without invalidating the advertised block length.
 
 ## Explicitly unsupported
 

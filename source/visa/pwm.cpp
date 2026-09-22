@@ -6,17 +6,21 @@ namespace Visa {
     using namespace SCPI;
 
     void printReal(float value) {
+#ifdef CTI_AVR_FIXED_REAL_OUTPUT
         bool negative = value < 0.0f;
         if (negative) {
             value = -value;
         }
         uint32_t whole = static_cast<uint32_t>(value);
-        uint16_t fraction = static_cast<uint16_t>((value - whole) * 1000.0f + 0.5f);
-        if (fraction == 1000) {
+        uint32_t fraction = static_cast<uint32_t>((value - whole) * 1000000.0f + 0.5f);
+        if (fraction == 1000000) {
             ++whole;
             fraction = 0;
         }
-        gPlatform.IO.Printf("%s%lu.%03u\n", negative ? "-" : "", whole, fraction);
+        gPlatform.IO.Printf("%s%lu.%06lu\n", negative ? "-" : "", whole, fraction);
+#else
+        gPlatform.IO.Printf("%f\n", value);
+#endif
     }
 
     CommandResult pwm_init(ScpiParser* scpi) {

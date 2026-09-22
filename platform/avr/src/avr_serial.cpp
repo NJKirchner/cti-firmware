@@ -12,10 +12,6 @@ volatile uint8_t rxHead;
 volatile uint8_t rxTail;
 
 int uartPutchar(char value, FILE*) {
-    if (value == '\n') {
-        uartPutchar('\r', nullptr);
-    }
-
     while (!(UCSR0A & _BV(UDRE0))) {
     }
     UDR0 = static_cast<uint8_t>(value);
