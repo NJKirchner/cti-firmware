@@ -50,6 +50,14 @@ $avrdude = "$env:LOCALAPPDATA\Arduino15\packages\arduino\tools\avrdude\6.3.0-ard
 After reset, connect at **115200 baud, 8 data bits, no parity, one stop bit**.
 Commands are newline terminated. `*IDN?` reports vendor `CTI`, model
 `Arduino-Uno-ATmega328P`, serial `UNAVAILABLE`, and the firmware version.
+The firmware prints only `CTI ready` during boot; it does not issue `*IDN?` or
+send an IDN response automatically.
+
+Digital availability accepts either the SCPI short form `DIG:AVAIL?` or full
+form `DIGital:AVAILable?`. The response is an IEEE-style arbitrary block, not a
+text line: `#222`, followed by 22 binary bytes
+`00 00 00 12 02 03 ... 13`, followed by CRLF. The first four binary bytes
+encode an 18-element list, and the remaining bytes are Arduino pins D2-D19.
 
 ## Supported interfaces
 

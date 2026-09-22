@@ -133,11 +133,14 @@ int ScpiParser::bufferInput(const char* data, int count) {
             if (data[i] == ' ' || data[i] == '?' || data[i] == '\n') {
                 ParserStatus result = parseNode();
                 if (result != ParserStatus::Success) {
+                    errUndefinedHeader(this);
                     _state = ParserState::InvalidNode;
                 }
                 _bufSize = 0;
                 if (data[i] == '\n') {
-                    invokeNode();
+                    if (result == ParserStatus::Success) {
+                        invokeNode();
+                    }
                     reset();
                 }
             }
@@ -235,6 +238,8 @@ ParseResult ScpiParser::parseBlock(char** buffer, int* length) {
 }
 
 ParserStatus ScpiParser::parseNode() {
+    _curCommand = nullptr;
+
     uint8_t commandLength = _bufSize;
     char terminator = _buf[commandLength - 1];
     --commandLength;
