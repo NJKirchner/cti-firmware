@@ -6,8 +6,9 @@ UART, I2C, SPI, timers, unique ID, and the board status LED.
 
 ## Prerequisites
 
-Use the Pico SDK and ARM toolchain versions configured near the top of the
-repository `CMakeLists.txt`. Ensure CMake and Ninja are available on `PATH`.
+The repository is pinned to Pico SDK 2.3.1, Arm GNU Toolchain 15.2.Rel1,
+picotool 2.3.1, CMake 4.3.4, and Ninja 1.13.2. The official Raspberry Pi Pico
+VS Code extension can install and select this coherent tool bundle.
 
 ## Raspberry Pi Pico 2
 
