@@ -25,7 +25,8 @@ void Platform::Setup() {
     // Output availability will depend on the communication method
     // and the connection being active.
 
-#ifdef CTI_MINIMAL_STARTUP
+#if defined(CTI_SILENT_STARTUP)
+#elif defined(CTI_MINIMAL_STARTUP)
     gPlatform.IO.Print("CTI ready\n");
 #else
     const char* engine = CTI_STR(CTI_ENGINE);
@@ -42,7 +43,7 @@ void Platform::Setup() {
 #endif
     gPlatform.Init();
 
-#ifndef CTI_MINIMAL_STARTUP
+#if !defined(CTI_SILENT_STARTUP) && !defined(CTI_MINIMAL_STARTUP)
     gPlatform.IO.Print("OK\n");
     gPlatform.IO.Flush();
 #endif

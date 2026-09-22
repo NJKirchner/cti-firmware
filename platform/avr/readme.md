@@ -50,8 +50,10 @@ $avrdude = "$env:LOCALAPPDATA\Arduino15\packages\arduino\tools\avrdude\6.3.0-ard
 After reset, connect at **115200 baud, 8 data bits, no parity, one stop bit**.
 Commands are newline terminated. `*IDN?` reports vendor `CTI`, model
 `Arduino-Uno-ATmega328P`, serial `UNAVAILABLE`, and the firmware version.
-The firmware prints only `CTI ready` during boot; it does not issue `*IDN?` or
-send an IDN response automatically.
+The AVR command channel is silent during boot and reset. The first received
+bytes are therefore the response to the first command sent after the device is
+ready; the firmware does not issue `*IDN?` or send an IDN response
+automatically.
 
 Digital availability accepts either the SCPI short form `DIG:AVAIL?` or full
 form `DIGital:AVAILable?`. The response is an IEEE-style arbitrary block, not a

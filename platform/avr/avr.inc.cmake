@@ -26,7 +26,7 @@ function(configure_avr AVR_TARGET)
         SCPI_ERR_BUFFER_SIZE=23
         SCPI_MAX_COMMANDS=36
         CTI_IO_BUFFER_LENGTH=16
-        CTI_MINIMAL_STARTUP=1
+        CTI_SILENT_STARTUP=1
         CTI_MINIMAL_ERROR_STRINGS=1
         PlatformTickType=uint32_t
     )
