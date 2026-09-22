@@ -124,6 +124,11 @@ void ScpiParser::reset() {
 
 int ScpiParser::bufferInput(const char* data, int count) {
     for (int i = 0; i < count; ++i) {
+        if (_state == ParserState::FindCommand && _bufSize == 0 &&
+            (data[i] == '\r' || data[i] == '\n')) {
+            continue;
+        }
+
         if (_bufSize >= _bufCapacity) {
             return i;
         }
@@ -145,7 +150,7 @@ int ScpiParser::bufferInput(const char* data, int count) {
                 }
             }
         } else if (_state == ParserState::FindEndOfLine) {
-            if (data[i] == '\n') {
+            if (data[i] == '\n' && isMessageTerminator()) {
                 invokeNode();
                 reset();
             }
@@ -154,6 +159,43 @@ int ScpiParser::bufferInput(const char* data, int count) {
         }
     }
     return count;
+}
+
+bool ScpiParser::isMessageTerminator() const {
+    if (_bufSize == 0 || _buf[_bufSize - 1] != '\n') {
+        return false;
+    }
+
+    int position = 0;
+    const int end = _bufSize - 1;
+    while (position < end) {
+        if (_buf[position] != '#' || position + 1 >= end ||
+            !isdigit(static_cast<unsigned char>(_buf[position + 1]))) {
+            ++position;
+            continue;
+        }
+
+        int digitCount = _buf[position + 1] - '0';
+        int lengthStart = position + 2;
+        int payloadStart = lengthStart + digitCount;
+        if (digitCount == 0 || payloadStart > end) {
+            return false;
+        }
+
+        int payloadLength = 0;
+        for (int digit = lengthStart; digit < payloadStart; ++digit) {
+            if (!isdigit(static_cast<unsigned char>(_buf[digit]))) {
+                return true;
+            }
+            payloadLength = payloadLength * 10 + _buf[digit] - '0';
+        }
+
+        if (payloadStart + payloadLength > end) {
+            return false;
+        }
+        position = payloadStart + payloadLength;
+    }
+    return true;
 }
 
 ParseResult ScpiParser::parseChoice(const ScpiChoice* choices, int32_t& value) {

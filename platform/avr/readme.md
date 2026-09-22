@@ -55,6 +55,31 @@ bytes are therefore the response to the first command sent after the device is
 ready; the firmware does not issue `*IDN?` or send an IDN response
 automatically.
 
+Opening the Uno virtual COM port normally pulses DTR and resets the ATmega328P.
+The Optiboot bootloader owns UART0 for roughly 0.5 seconds before the firmware
+and SCPI parser exist. A query transmitted during that interval can be consumed
+or truncated by the bootloader and cannot be recovered by application
+firmware. After opening the port, wait at least one second before the first
+query (two seconds is a conservative cross-host value), or configure the host
+not to toggle DTR when the serial API permits it. Do not retry by appending to a
+partial line: send a newline to discard it, then resend the complete query.
+
+A byte-level identity check should use one persistent serial session:
+
+1. Open at 115200 8N1 and wait two seconds (or open without toggling DTR).
+2. Discard any host-side bytes retained from an older session. Current firmware
+   emits no reset text.
+3. Write exactly `2A 49 44 4E 3F 0A` (`*IDN?\n`).
+4. Read through LF. The response must be exactly
+   `CTI,Arduino-Uno-ATmega328P,UNAVAILABLE,<version>\n`.
+5. Repeat steps 3-4 without reopening the port; every query must return one IDN
+   line. `*IDN?\r\n` is accepted as well.
+
+If step 3 is intentionally performed immediately after a DTR reset, no response
+is guaranteed: Optiboot, not this firmware, owns UART0. If only a suffix such as
+`IDN?\n` reaches the application, it is correctly rejected as unknown. Wait for
+application startup and resend the complete six-byte query.
+
 Digital availability accepts either the SCPI short form `DIG:AVAIL?` or full
 form `DIGital:AVAILable?`. The response is an IEEE-style arbitrary block, not a
 text line: `#222`, followed by 22 binary bytes

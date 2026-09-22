@@ -254,6 +254,7 @@ namespace SCPI {
     private:
         ParserStatus parseNode();
         ParserStatus invokeNode();
+        bool isMessageTerminator() const;
 
         void consumeWhiteSpace() {
             while (_paramPos < _bufSize &&

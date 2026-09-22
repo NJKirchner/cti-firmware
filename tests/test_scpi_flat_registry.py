@@ -131,6 +131,12 @@ class FlatRegistryTests(unittest.TestCase):
             with self.subTest(pattern=pattern, spelling="long"):
                 self.assertEqual(len(self.handlers_for(long)), 1)
 
+    def test_avr_registry_capacity_matches_registered_command_count(self):
+        cmake = (ROOT / "platform/avr/avr.inc.cmake").read_text(encoding="utf-8")
+        capacity = int(re.search(r"SCPI_MAX_COMMANDS=(\d+)", cmake).group(1))
+        self.assertEqual(len(self.patterns), 36)
+        self.assertEqual(capacity, len(self.patterns))
+
 
 class UnoGoldenWireTests(unittest.TestCase):
     def test_digital_availability(self):
@@ -225,6 +231,27 @@ class UnoGoldenWireTests(unittest.TestCase):
         self.assertIn('"BOTH\\n"', digital)
         self.assertIn('"#%u%u"', visa)
         self.assertIn('"%d, %s\\n"', visa)
+
+    def test_uart_ring_wrap_preserves_an_idn_query(self):
+        source = (ROOT / "platform/avr/src/avr_serial.cpp").read_text(encoding="utf-8")
+        capacity = int(re.search(r"RxBufferSize = (\d+)", source).group(1))
+        self.assertEqual(capacity, 32)
+
+        storage = bytearray(capacity)
+        head = 29
+        tail = 29
+        query = b"*IDN?\n"
+        for byte in query:
+            next_head = (head + 1) % capacity
+            self.assertNotEqual(next_head, tail)
+            storage[head] = byte
+            head = next_head
+
+        received = bytearray()
+        while head != tail:
+            received.append(storage[tail])
+            tail = (tail + 1) % capacity
+        self.assertEqual(received, query)
 
 
 if __name__ == "__main__":
