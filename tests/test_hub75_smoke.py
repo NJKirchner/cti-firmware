@@ -33,7 +33,7 @@ class FakeSerial:
     def write(self, data):
         self.writes.append(data)
         if data == b"*IDN?\n":
-            self.responses.extend((b" == Initializing Firmware ==\n", b"CTI,RP2350-Visa,123,0.9.4\n"))
+            self.responses.extend((b" == Initializing Firmware ==\n", b"CTI,RP2350-Visa,123,0.9.5\n"))
         elif data == b"SYST:ERR?\n":
             self.responses.append(b"0, No error\n")
         elif data == b"DISP:HUB75:GEOM?\n":

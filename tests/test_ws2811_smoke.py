@@ -18,7 +18,7 @@ class FakeSerial:
     def write(self, data):
         self.writes.append(data)
         if data == b"*IDN?\n":
-            self.responses.append(b"CTI,RP2040-Visa,123,0.9.4\n")
+            self.responses.append(b"CTI,RP2040-Visa,123,0.9.5\n")
         elif data == b"SYST:ERR?\n":
             self.responses.append(b"0, No error\n")
         elif data == b"DISP:WS2811:STOP\n":

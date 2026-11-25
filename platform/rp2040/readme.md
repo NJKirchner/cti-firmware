@@ -15,8 +15,8 @@ cmake -S . -B build\hub75-pico -G Ninja -DPICO_BOARD=pico -DCMAKE_BUILD_TYPE=Rel
 cmake --build build\hub75-pico
 ```
 
-Flash `uf2\cti_visa_rp2040_pico_0.9.4.uf2`. For Pico W use a separate build directory
-and `-DPICO_BOARD=pico_w`, producing `uf2\cti_visa_rp2040_pico_w_0.9.4.uf2`.
+Flash `uf2\cti_visa_rp2040_pico_0.9.5.uf2`. For Pico W use a separate build directory
+and `-DPICO_BOARD=pico_w`, producing `uf2\cti_visa_rp2040_pico_w_0.9.5.uf2`.
 Do not flash the Pico 2 firmware onto either RP2040 board.
 
 The same standard firmware includes the runtime

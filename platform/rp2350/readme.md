@@ -34,7 +34,7 @@ cmake --build build\pico2
 The versioned UF2 is generated in the build directory and copied to:
 
 ```text
-uf2\cti_visa_rp2350_pico2_0.9.4.uf2
+uf2\cti_visa_rp2350_pico2_0.9.5.uf2
 ```
 
 ## Raspberry Pi Pico 2 W
@@ -49,7 +49,7 @@ cmake --build build\pico2_w
 The versioned UF2 is generated in the build directory and copied to:
 
 ```text
-uf2\cti_visa_rp2350_pico2_w_0.9.4.uf2
+uf2\cti_visa_rp2350_pico2_w_0.9.5.uf2
 ```
 
 Hold **BOOTSEL** while connecting the board, then copy the matching UF2 to the

@@ -294,7 +294,7 @@ cmake -S . -B build\hub75-64x32 -G Ninja -DPICO_BOARD=pico2 -DCTI_HUB75_WIDTH=64
 cmake --build build\hub75-64x32
 ```
 
-Its output is the standard `uf2\cti_visa_rp2350_pico2_0.9.4.uf2`; runtime DIM
+Its output is the standard `uf2\cti_visa_rp2350_pico2_0.9.5.uf2`; runtime DIM
 can still change the geometry. For offline generation, pass `--width` and `--height`; that stream configures
 the device but cannot query errors.
 
@@ -409,7 +409,7 @@ cmake -S . -B build\hub75-pico2 -G Ninja -DPICO_BOARD=pico2 -DCMAKE_BUILD_TYPE=R
 cmake --build build\hub75-pico2
 ```
 
-The output is `uf2\cti_visa_rp2350_pico2_0.9.4.uf2`. This standard firmware
+The output is `uf2\cti_visa_rp2350_pico2_0.9.5.uf2`. This standard firmware
 includes both HUB75 and [WS2811](ws2811.md); neither service starts at boot.
 Display-specific `cti_hub75_...` duplicate names are no longer generated.
 For RP2040 Pico, build the same service with:
@@ -419,8 +419,8 @@ cmake -S . -B build\hub75-pico -G Ninja -DPICO_BOARD=pico -DCMAKE_BUILD_TYPE=Rel
 cmake --build build\hub75-pico
 ```
 
-Its output is `uf2\cti_visa_rp2040_pico_0.9.4.uf2`. Use `-DPICO_BOARD=pico_w`
-in another build directory for `uf2\cti_visa_rp2040_pico_w_0.9.4.uf2`. Never flash a
+Its output is `uf2\cti_visa_rp2040_pico_0.9.5.uf2`. Use `-DPICO_BOARD=pico_w`
+in another build directory for `uf2\cti_visa_rp2040_pico_w_0.9.5.uf2`. Never flash a
 Pico 2 UF2 onto RP2040 or vice versa. The SCPI commands, GP2..GP15 example
 mapping, upload formats and host tool are identical on both chips.
 
