@@ -209,6 +209,65 @@ and benchmark, not guaranteed LabVIEW cycle times or optical validation.
 The slow image was already a Release build; changing optimization mode or the
 PIO scan rate was not the fix. Both old and new builds use SDK 2.3.1.
 
+#### Controlled regression comparison
+
+Further same-board testing isolated flash-cache conflicts in the per-byte
+receive/service path, rather than a change to HUB75 scan timing or binary parsing.
+The preserved November 5 image measured 28.7..28.9 ms for DATA plus acknowledgement.
+Rebuilding the first WS2811 commit (`c6df048`) with the same Release toolchain/SDK
+measured 41.2 ms; the actual slow timing-configurable image (`e03eaf8`) measured
+92.5..92.6 ms.
+
+To avoid confusing a source change with a different linker layout, controls were
+made from the **actual slow UF2**, retaining the rest of the firmware layout:
+
+| Slow-image control | DATA plus acknowledgement median |
+|---|---:|
+| Unmodified | 92.5..92.6 ms |
+| Replace only the four-byte per-byte WS2811 call with two NOPs | 65.7 ms |
+| Relocate the same 152-byte receive loop, preserving its calls/logic | 54.1..54.2 ms |
+| Relocate the loop and skip the WS2811 call | 29.1..29.3 ms |
+
+Both control pairs were repeated in reverse order. Relocation changes only the
+loop's flash placement and necessary branch displacements, not the SDK, parser,
+PIO or read size. These images are **test-only**, not alternate production
+firmware; disabling servicing breaks active WS2811 operation.
+
+A separate, unchanged diagnostic binary selected read size and service calls at
+runtime. Four forward/reverse passes (160 timed uploads per mode) measured:
+
+| Diagnostic mode, HUB75 running and WS2811 stopped | DATA median | Approx. XIP cache misses/upload |
+|---|---:|---:|
+| One byte, skip WS2811 service | 29.48 ms | 467 |
+| One byte, normal flash-resident WS2811 service | 54.51 ms | 35662 |
+| One byte, identical WS2811 service body in SRAM | 30.16 ms | 478 |
+| 64 bytes, normal WS2811 service | 8.74 ms | 1595 |
+
+Counters cover the upload/acknowledgement window, including warmups and status
+queries. Absolute timings differ from the original UF2 because diagnostic code
+changes the flash layout; comparisons **within** that one binary isolate runtime
+choices. The SRAM control and cache counters explain why even a stopped
+WS2811 service can be expensive: repeated instruction/literal fetches evict hot
+receive code. Added code and changed placement made an existing per-byte design
+sensitive to flash-cache conflicts. Simply removing one call does not eliminate
+the whole regression.
+
+Batching applies to **all SCPI input**, but consumes whatever bytes are available;
+it does not wait for 64 bytes, combine SCPI messages, or change command order.
+On the production image, short-query medians were approximately 0.6..0.7 ms
+(`*IDN?`) and 0.2..0.3 ms (`SYST:ERR?` and `DISP:HUB75:FORM?`), with no 20 ms or
+batch-fill delay. A 1024-command `*WAI` receive/dispatch-only stream improved from
+about 120.7 ms on the slow image to 13.3..13.5 ms; this is not a peripheral-I/O
+timing claim.
+
+Hardware checks covered mixed commands in one write, fragmented commands and
+parameters, DATA containing every byte value, binary GPIO-availability responses
+containing NUL/LF/CR, unknown-command recovery, and a truncated binary block timing
+out after two idle seconds followed by successful commands. The running/stopped
+display cases were both exercised. This does not bench-test every peripheral.
+The connected Pico 2 was restored to the unchanged production image
+`20261125T170818Z`, with GP2..GP15, RGB332 and a ramp refreshing at 25%.
+
 ## Display dimensions
 
 Geometry is **runtime configuration** using `DISP:HUB75:DIM width,height`
