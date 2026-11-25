@@ -191,43 +191,6 @@ namespace Visa {
         return 0;
     }
 
-    void Visa::MainLoop() {
-        int val; // timeout read value, will be -1 if timed out
-        char c;
-        unsigned idleReads = 0;
-
-        while(true) {
-            Hub75::service(&_parser);
-            WS2811::service(&_parser);
-            val = gPlatform.IO.FGetCtimeout(20000); //20 ms, dictates when activity status is cleared
-
-            if (val == -1) {
-                gPlatform.IO.StatusLED(false, Comms);
-                if (_parser.hasPendingInput() && ++idleReads >= 100) {
-                    _parser.enqueueError(-161, "Incomplete SCPI message timed out after 2 seconds");
-                    _parser.reset();
-                    idleReads = 0;
-                }
-            } else {
-                idleReads = 0;
-                c = val;
-                //gPlatform.IO.StatusLED(true, Comms);
-                if (!_parser.bufferInput(&c, 1)) {
-                    gPlatform.IO.Print("**ERROR: Input Overflow");
-
-                    //consume rest of input and reset parser
-                    while (true) {
-                        val = gPlatform.IO.FGetCtimeout(20000);
-                        if (val == -1 || val == '\n') {
-                            _parser.reset();
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     const char* Visa::StatusText(int status) {
         return status == -1 ? "SCPI command registration failed" : "";
     }

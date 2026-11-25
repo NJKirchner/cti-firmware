@@ -3,6 +3,11 @@
 #include <pico/stdlib.h>
 #include <hardware/adc.h>
 
+int CTI::PlatformIO::ReadStdinTimeout(char* buffer, int maxLen, uint32_t timeout_us) {
+    int count = stdio_get_until(buffer, maxLen, make_timeout_time_us(timeout_us));
+    return count == PICO_ERROR_TIMEOUT ? 0 : count;
+}
+
 int CTI::PlatformIO::_getchar_timeout_us(uint32_t timeout_us) {
     int c = getchar_timeout_us(timeout_us);
     if (c == PICO_ERROR_TIMEOUT) {

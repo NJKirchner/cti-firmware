@@ -7,6 +7,8 @@ foreach(TEST_TARGET IN ITEMS cti_tests cti_tests_rp2040)
 add_executable(${TEST_TARGET}
     test_main.cpp
     test_ws2811.cpp
+    test_visa_receive.cpp
+    ../source/visa/visa_receive.cpp
     ../source/scpi/scpi_parser.cpp
     ../source/scpi/scpi_node.cpp
     ../source/scpi/scpi_error_queue.cpp

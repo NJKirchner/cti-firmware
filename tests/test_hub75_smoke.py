@@ -38,6 +38,8 @@ class FakeSerial:
             self.responses.append(b"0, No error\n")
         elif data == b"DISP:HUB75:GEOM?\n":
             self.responses.append(f"{self.width},{self.height},{self.expected},4\n".encode())
+        elif data == b"DISP:HUB75:DIM?\n":
+            self.responses.append(f"{self.width},{self.height}\n".encode())
         elif data == b"DISP:HUB75:STOP\n":
             self.running = False
             self.received = 0
@@ -57,6 +59,8 @@ class FakeSerial:
             remaining = data
             while remaining:
                 match = re.match(rb"DISP:HUB75:DATA (\d+),#(\d)", remaining)
+                if match and int(match[1]) == 0:
+                    self.received = 0
                 assert match and int(match[1]) == self.received
                 digits = int(match[2])
                 length = int(remaining[match.end():match.end() + digits])

@@ -174,8 +174,40 @@ At **1 Mbps effective image-payload throughput**, 4096 bytes takes 32.768 ms,
 or a theoretical 30.52 new images/s before command/host overhead. This is
 independent of the nominal 72.67 Hz PIO panel refresh. USB full-speed signaling
 is 12 Mbps; neither that ceiling nor the CDC nominal 115200 baud setting
-guarantees an application's sustained transfer rate. No real-device USB
-throughput measurement has been made here.
+guarantees an application's sustained transfer rate.
+
+### Measuring USB upload performance
+
+The receive loop reads up to **64 available bytes per SDK call**, instead of
+one byte at a time. It returns immediately when any data is available, so short
+queries do not wait for a full packet. HUB75/WS2811 servicing runs between
+batches; DMA/PIO refresh is unchanged. The two-second incomplete-message idle
+timeout and definite-block binary framing are preserved.
+
+To separate host write time from firmware processing, use an already configured,
+running display (close other applications using its port):
+
+```powershell
+python tools\hub75_benchmark.py --port COM7 --frames 30 --chunk-bytes 2000
+python tools\hub75_benchmark.py --port COM7 --frames 300 --chunk-bytes 2000 --show
+```
+
+The default only replaces staging; it does not change the visible image or
+configuration. `--show` displays the generated ramp after every complete upload.
+The JSON result reports write time, DATA plus an error-query acknowledgement
+barrier, and (with SHOW) the full upload/swap/error-check cycle. The latter uses
+10 ms status polling, so it includes host polling latency, not just panel timing.
+
+On one physical Pico 2 over Windows USB CDC, at 64x64 RGB332 with 2000-byte
+chunks, the November 9 image's DATA plus acknowledgement took about **92.6 ms**.
+The preserved November 5 HUB75 image took **28.8 ms**. Batched reception measured
+**8.84 ms median** for DATA plus acknowledgement and **25.52 ms median** for
+the full upload/SHOW/swap/error-check cycle across 300 updates, without SCPI
+errors. At 256-byte chunks the fixed DATA plus acknowledgement was about
+11.46 ms versus 100.45 ms before. These are measurements of this host/board
+and benchmark, not guaranteed LabVIEW cycle times or optical validation.
+The slow image was already a Release build; changing optimization mode or the
+PIO scan rate was not the fix. Both old and new builds use SDK 2.3.1.
 
 ## Display dimensions
 

@@ -67,6 +67,8 @@ public:
     int FGetC() { return fgetc(stdin); };
     int FPutC(int c) { return fputc(c, stdout); };
     void ReadStdin(char** buffer, size_t maxLen);
+    // Returns available bytes immediately, zero on timeout, or a negative read error.
+    int ReadStdinTimeout(char* buffer, int maxLen, uint32_t timeout_us);
 
     void InitStatusLED();
     void StatusLED(bool val, StatusSource source = User);

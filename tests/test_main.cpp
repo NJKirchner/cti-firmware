@@ -16,6 +16,7 @@ CTI::Platform CTI::gPlatform;
 using namespace CTI;
 using namespace CTI::SCPI;
 void ws2811Tests();
+void visaReceiveTests();
 
 namespace Fake {
 int allocationsBeforeFailure = -1;
@@ -558,5 +559,6 @@ int main(int argc, char** argv) {
     rgb332Tests();
     runtimeTests();
     ws2811Tests();
+    visaReceiveTests();
     std::cout << "All host tests passed (mock SDK; no physical panel timing validation)\n";
 }
